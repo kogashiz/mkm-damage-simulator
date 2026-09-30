@@ -43,8 +43,14 @@ export class Convict {
         // return Math.round(this.baseAtkLv1 + (gap * (level - 1) / 89));
     }
 
-    // /** スキル効果の取得（子クラスで上書きする）⇒ 用途よくわかってないので一旦コメントアウト */
-    // getSkillEffects(attackType, skills) {
-    //     return [];
-    // }
+    /** スキル効果の取得（子クラスで上書きする）⇒ 用途よくわかってないので一旦コメントアウト */
+    getBuffMods() {
+        return {
+            atkMods: [],      // ATKアップ、ATKダウン
+            defMods: [],      // DEF/MDFアップ、DEF/MDFダウン、物理/魔法貫通※mdf用まだ作ってない
+            damageMods: [],   // 基礎ダメージ係数、ダメージ係数アップ
+            critMods: [],     // クリティカルダメージアップ
+            etcMods: []       // ダメージアップ系、被ダメージアップ系、ダメージダウン系、被ダメージダウン系、コア状態被ダメージ補正
+        };
+    }
 }
