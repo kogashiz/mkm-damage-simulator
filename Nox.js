@@ -69,7 +69,7 @@ export class Nox extends Convict {
 
     constructor() {
         // super()で親を初期化。id(いる？漢字のキャラだとつづり困る), name(ゲーム中の正式名表記), lv1atk, lv90atk, passive名(いる？)
-        super("nox", "NOX", 145, 622, "魂の侵蝕", "幽冥戦慄");
+        super("nox", "NOX", 145, 622, 0.86);
     }
 
     /**
@@ -113,7 +113,7 @@ export class Nox extends Convict {
             createBuffMod(ATTACK_TYPE.NORMAL, EFFECT_TYPE.BASE_DAMAGE_COEF, toRatio(normalPercent))
         )
 
-        // 必殺技 ややこしいのであとで
+        // 必殺技 ややこしいのであとで TODO
 
 
         // パッシブ1 ややこしいし頻出バフじゃないのでもっと後回し

@@ -1,5 +1,6 @@
 import { Nox } from './Nox.js';
 import { Demolia } from './Demolia.js';
+import { getBattleTimeInSeconds } from './Helper.js';
 
 // 扱いたいコンビクトのインスタンスを生成して保持
 export const convicts = {
@@ -29,12 +30,19 @@ function updateCalculation() {
     const enemyDef = parseInt(document.getElementById('enemy-def').value) || 0;
     const isCoreBroken = document.getElementById('is-core-broken').checked;
 
-    // 3. インスタンス側のメソッドを使って計算
+    // 3. ダメージを計算インスタンス側のメソッドを使って計算
+    // 戦闘時間を取得
+    const seconds = getBattleTimeInSeconds();
+    // 通常攻撃を与える回数
+    const hitCount = Math.floor(seconds / convict.attackSpeed);
     // 1回あたりの通常攻撃ダメージ
     const oneHitFinalDamage = convict.calculateOneHitFinalAttackDamage(convict, enemyDef, isCoreBroken);
+    // 合計通常攻撃ダメージ
+    const finalDamage = hitCount * oneHitFinalDamage;
 
     // 4. 画面表示の更新（例: 基礎攻撃力の表示）
-    document.getElementById('output-damage').textContent = `${oneHitFinalDamage.toLocaleString()} Damage`;
+    document.getElementById('output-one-hit-damage').textContent = `${oneHitFinalDamage.toLocaleString()} Damage`;
+    document.getElementById('output-damage').textContent = `${finalDamage.toLocaleString()} Damage`;
     const outBaseAtk = document.getElementById('out-base-atk');
     outBaseAtk.textContent = convict.baseAtk;
     
@@ -42,13 +50,8 @@ function updateCalculation() {
     const debugData = {
         targetConvict: convict.name,
         convictAtk: convict.baseAtk,
+        attackSpeed: convict.attackSpeed,
         returnedSkillEffects: convict.getBuffMods(), // スキルが返した効果配列
-        // enemyCondition: {
-        //     def: enemyDef,
-        //     defFactorRate: `${(result.defRate * 100).toFixed(1)}%`,
-        //     coreBreakMultiplier: isCoreBroken ? "150%" : "100%"
-        // },
-        // finalDamagePerHit: result.damage
     };
     document.getElementById('debug-json').textContent = JSON.stringify(debugData, null, 2);
 }
@@ -68,6 +71,8 @@ const inputIds = [
     'pas2-skill-lv',
     'enemy-def',
     'is-core-broken',
+    'time-min',
+    'time-sec',
 ];
 
 inputIds.forEach(id => {
