@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>【無期迷途】コンビクト 1発ダメージ計算シミュレーター</title>
+    <script type="module" src="main.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f4f4f7;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 20px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 8px;
+            margin-top: 0;
+        }
+        h2 {
+            font-size: 16px;
+            background-color: #e2e8f0;
+            padding: 6px 10px;
+            margin-top: 0;
+            border-left: 4px solid #4a5568;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .card {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 16px;
+            flex: 1;
+            min-width: 300px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        label {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        input[type="number"], select {
+            width: 100px;
+            padding: 6px;
+            border: 1px solid #94a3b8;
+            border-radius: 4px;
+            text-align: right;
+            font-size: 14px;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .checkbox-group input {
+            width: 18px;
+            height: 18px;
+        }
+        .result-box {
+            background-color: #f8fafc;
+            border: 2px solid #0284c7;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+        .result-title {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+        .result-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #0369a1;
+        }
+        .debug-box {
+            margin-top: 15px;
+            background-color: #1e293b;
+            color: #f8fafc;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>コンビクト ダメージ計算シミュレーター</h1>
+    <img src="https://cdn.wikiwiki.jp/to/w/ptn/FrontPage/::ref/PathtonowhereTOP.jpg.webp?rev=ec11501ac7ae8538756916fafc667920&t=20221209030013"
+     alt="画像の説明" width="300" height="200">
+    <img src="zoya.png"
+     alt="画像の説明" width="100" height="100">
+
+    <div class="container">
+        <!-- 左側: コンビクト選択・育成ステータス -->
+        <div class="card">
+            <h2>1. コンビクト 育成ステータス</h2>
+
+            <div class="form-group">
+                <label for="select-convict">対象コンビクト:</label>
+                <select id="select-convict">
+                    <option value="demolia">デモーリー</option>
+                    <option value="nox">NOX</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="char-level">キャラクターレベル (1〜90):</label>
+                <input type="number" id="char-level" value="80" min="1" max="90">
+            </div>
+
+            <div class="form-group">
+                <label for="normal-skill-lv">通常攻撃 スキルLv (1〜10):</label>
+                <input type="number" id="normal-skill-lv" value="7" min="1" max="10">
+            </div>
+
+            <div class="form-group">
+                <label for="ult-skill-lv">必殺技 スキルLv (1〜10):</label>
+                <input type="number" id="ult-skill-lv" value="7" min="1" max="10">
+            </div>
+
+            <div class="form-group">
+                <label for="pas1-skill-lv">パッシブ1 スキルLv (1〜10):</label>
+                <input type="number" id="pas1-skill-lv" value="7" min="1" max="10">
+            </div>
+
+            <div class="form-group">
+                <label for="pas2-skill-lv">パッシブ2 スキルLv (1〜10):</label>
+                <input type="number" id="pas2-skill-lv" value="7" min="1" max="10">
+            </div>
+        </div>
+
+        <!-- 右側: 敵ステータス設定 -->
+        <div class="card">
+            <h2>2. 敵ステータス設定</h2>
+
+            <div class="form-group">
+                <label for="enemy-hp">敵 HP:(未反映)</label>
+                <input type="number" id="enemy-hp" value="1000" min="1" disabled>
+            </div>
+
+            <div class="form-group">
+                <label for="enemy-def">敵 物理防御力 (DEF):</label>
+                <input type="number" id="enemy-def" value="25" min="0">
+            </div>
+
+            <div class="form-group">
+                <label for="enemy-mdf">敵 魔法防御力 (MDF)(未反映):</label>
+                <input type="number" id="enemy-mdf" value="10" min="0" disabled>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="is-core-broken" checked>
+                <label for="is-core-broken">コアブレイク中 (被ダメ倍率 150% 固定中)</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="result-box">
+        <div class="result-title">通常攻撃 1発あたりの与えるダメージ:</div>
+        <div class="result-value" id="output-damage">0 Damage</div>
+
+        <div style="margin-top: 10px; font-size: 13px; color: #475569;">
+            ・基礎攻撃力: <span id="out-base-atk" style="font-weight:bold;">0</span><br>
+        </div>
+    </div>
+
+    <!-- 内部データ構造のデバッグ確認用 -->
+    <h3 style="font-size: 14px; margin-top: 20px;">■ スキル発動時に返される「効果配列 (イベントデータ)」構造の確認</h3>
+    <div class="debug-box" id="debug-json">データ計算中...</div>
+    
+</body>
+</html>
