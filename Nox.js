@@ -69,7 +69,7 @@ export class Nox extends Convict {
 
     constructor() {
         // super()で親を初期化。id(いる？漢字のキャラだとつづり困る), name(ゲーム中の正式名表記), lv1atk, lv90atk, passive名(いる？)
-        super("nox", "NOX", 145, 622, 0.86);
+        super("nox", "NOX", 145, 622, 0.86, 45);
     }
 
     /**

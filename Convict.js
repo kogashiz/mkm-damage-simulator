@@ -11,12 +11,13 @@ export class Convict {
      * @param {string} pas2Name - パッシブ2の名前
      */
     // 各キャラ固有のステータス、子クラスから初期値を設定する
-    constructor(id, name, baseAtkLv1, baseAtkLv90, attackSpeed) {
+    constructor(id, name, baseAtkLv1, baseAtkLv90, attackSpeed, ultEnergyCost) {
         this.id = id;
         this.name = name;
         this.baseAtkLv1 = baseAtkLv1;
         this.baseAtkLv90 = baseAtkLv90;
         this.attackSpeed = attackSpeed;
+        this.ultEnergyCost = ultEnergyCost;
 
         // 画面からの入力値を保持する、super()した直後は未初期化状態のため、初期値-1とする
         // 多分ここに追加：専属とか刻印とか

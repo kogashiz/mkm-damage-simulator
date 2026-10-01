@@ -39,6 +39,9 @@ function updateCalculation() {
     const oneHitFinalDamage = convict.calculateOneHitFinalAttackDamage(convict, enemyDef, isCoreBroken);
     // 合計通常攻撃ダメージ
     const finalDamage = hitCount * oneHitFinalDamage;
+    // 設定した戦闘時間中に必殺技が何回打てるか
+    const ultCount = Math.floor(seconds / convict.ultEnergyCost);
+    console.log(ultCount);
 
     // 4. 画面表示の更新（例: 基礎攻撃力の表示）
     document.getElementById('output-one-hit-damage').textContent = `${oneHitFinalDamage.toLocaleString()} Damage`;
