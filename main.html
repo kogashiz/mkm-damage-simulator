@@ -119,7 +119,7 @@
 
             <div class="form-group">
                 <label for="char-level">キャラクターレベル (1〜90):</label>
-                <input type="number" id="char-level" value="70" min="1" max="90">
+                <input type="number" id="char-level" value="80" min="1" max="90">
             </div>
 
             <div class="form-group">
@@ -134,12 +134,12 @@
 
             <div class="form-group">
                 <label for="pas1-skill-lv">パッシブ1 スキルLv (1〜10):</label>
-                <input type="number" id="pas1-skill-lv" value="1" min="1" max="10">
+                <input type="number" id="pas1-skill-lv" value="7" min="1" max="10">
             </div>
 
             <div class="form-group">
                 <label for="pas2-skill-lv">パッシブ2 スキルLv (1〜10):</label>
-                <input type="number" id="pas2-skill-lv" value="1" min="1" max="10">
+                <input type="number" id="pas2-skill-lv" value="7" min="1" max="10">
             </div>
         </div>
 
@@ -148,23 +148,23 @@
             <h2>2. 敵ステータス設定</h2>
 
             <div class="form-group">
-                <label for="enemy-hp">敵 HP:</label>
-                <input type="number" id="enemy-hp" value="500000" min="1">
+                <label for="enemy-hp">敵 HP:(未反映)</label>
+                <input type="number" id="enemy-hp" value="1000" min="1" disabled>
             </div>
 
             <div class="form-group">
                 <label for="enemy-def">敵 物理防御力 (DEF):</label>
-                <input type="number" id="enemy-def" value="400" min="0">
+                <input type="number" id="enemy-def" value="25" min="0">
             </div>
 
             <div class="form-group">
-                <label for="enemy-mdf">敵 魔法防御力 (MDF):</label>
-                <input type="number" id="enemy-mdf" value="300" min="0">
+                <label for="enemy-mdf">敵 魔法防御力 (MDF)(未反映):</label>
+                <input type="number" id="enemy-mdf" value="10" min="0" disabled>
             </div>
 
             <div class="checkbox-group">
                 <input type="checkbox" id="is-core-broken" checked>
-                <label for="is-core-broken">コアブレイク中 (被ダメ倍率 150% 固定)</label>
+                <label for="is-core-broken">コアブレイク中 (被ダメ倍率 150% 固定)(未反映)</label>
             </div>
         </div>
     </div>

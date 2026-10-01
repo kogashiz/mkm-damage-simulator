@@ -86,6 +86,27 @@ export class Nox extends Convict {
             etcMods: []       // その他補正
         };
 
+        // 特性 
+        // 与ダメージ5%UP
+        buffs.etcMods.push(
+            createBuffMod(ATTACK_TYPE.NOT_ATTACK, EFFECT_TYPE.TAKEN_DAMAGE_UP, toRatio(5))
+        );
+        // コア破壊時与ダメージ5%UP
+        buffs.etcMods.push(
+            createBuffMod(ATTACK_TYPE.NOT_ATTACK, EFFECT_TYPE.CORE_BREAKING_DAMAGE_UP, toRatio(5))
+        );
+        
+        // 狂瞳深化
+        // 物理貫通15%UP
+        buffs.defMods.push(
+            createBuffMod(ATTACK_TYPE.NOT_ATTACK, EFFECT_TYPE.PHYSICAL_PENETRATION_UP, toRatio(15))
+        );
+
+        // ATK補正
+        buffs.atkMods.push(
+            createBuffMod(ATTACK_TYPE.NOT_ATTACK, EFFECT_TYPE.BASE_ATK, this.baseAtk)
+        )
+
         // 通常攻撃
         const normalPercent = Nox.NORMAL_SKILL_PCT[this.normalLv];
         buffs.damageMods.push(

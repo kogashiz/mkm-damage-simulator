@@ -25,10 +25,13 @@ function updateCalculation() {
 
     // 画面の入力値を反映
     convict.setUserData(level, normalLv, ultLv, pas1Lv, pas2Lv);
+    // 画面の敵ステータスを取得
+    const enemyDef = parseInt(document.getElementById('enemy-def').value) || 0;
+    const isCoreBroken = document.getElementById('is-core-broken').checked;
 
     // 3. インスタンス側のメソッドを使って計算
     // 1回あたりの通常攻撃ダメージ
-    const oneTimeFinalDamage = convict.calculateOneTimeFinalAttackDamage(convict);
+    const oneTimeFinalDamage = convict.calculateOneTimeFinalAttackDamage(convict, enemyDef, isCoreBroken);
 
     // 4. 画面表示の更新（例: 基礎攻撃力の表示）
     const outBaseAtk = document.getElementById('out-base-atk');
@@ -42,7 +45,7 @@ function updateCalculation() {
 
     // 5. デバッグ表示 (共通配列構造の可視化)
     const debugData = {
-        targetConvict: "デモーリー",
+        targetConvict: convict.name,
         calculatedAtk: convict.baseAtk,
         returnedSkillEffects: convict.getBuffMods(), // スキルが返した効果配列
         // enemyCondition: {
