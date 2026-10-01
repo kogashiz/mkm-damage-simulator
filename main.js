@@ -31,22 +31,17 @@ function updateCalculation() {
 
     // 3. インスタンス側のメソッドを使って計算
     // 1回あたりの通常攻撃ダメージ
-    const oneTimeFinalDamage = convict.calculateOneTimeFinalAttackDamage(convict, enemyDef, isCoreBroken);
+    const oneHitFinalDamage = convict.calculateOneHitFinalAttackDamage(convict, enemyDef, isCoreBroken);
 
     // 4. 画面表示の更新（例: 基礎攻撃力の表示）
+    document.getElementById('output-damage').textContent = `${oneHitFinalDamage.toLocaleString()} Damage`;
     const outBaseAtk = document.getElementById('out-base-atk');
     outBaseAtk.textContent = convict.baseAtk;
     
-    // 4. 計算結果を画面に反映
-    document.getElementById('output-damage').textContent = `${oneTimeFinalDamage.toLocaleString()} Damage`;
-    // document.getElementById('out-base-atk').textContent = currentAtk;
-    // document.getElementById('out-skill-mult').textContent = `${Math.round(result.multiplier * 100)}%`;
-    // document.getElementById('out-def-rate').textContent = `${(result.defRate * 100).toFixed(1)}%`;
-
     // 5. デバッグ表示 (共通配列構造の可視化)
     const debugData = {
         targetConvict: convict.name,
-        calculatedAtk: convict.baseAtk,
+        convictAtk: convict.baseAtk,
         returnedSkillEffects: convict.getBuffMods(), // スキルが返した効果配列
         // enemyCondition: {
         //     def: enemyDef,
@@ -70,7 +65,9 @@ const inputIds = [
     'normal-skill-lv',
     'ult-skill-lv',
     'pas1-skill-lv',
-    'pas2-skill-lv'
+    'pas2-skill-lv',
+    'enemy-def',
+    'is-core-broken',
 ];
 
 inputIds.forEach(id => {
@@ -81,9 +78,5 @@ inputIds.forEach(id => {
         element.addEventListener('change', updateCalculation);
     }
 });
-
-function test() {
-    alert('worked');
-} 
 
 window.addEventListener('DOMContentLoaded', updateCalculation);

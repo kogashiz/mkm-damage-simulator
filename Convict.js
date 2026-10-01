@@ -126,7 +126,7 @@ export class Convict {
     /**
      * ダメージ計算式。共通
      */
-    calculateOneTimeFinalDamage(convict, attackType, enemyDef, isCoreBroken) {
+    calculateOneHitFinalDamage(convict, attackType, enemyDef, isCoreBroken) {
         // 1. 最終ATKの算出
         const finalAtk = this.calculateFinalAtk(convict);
 
@@ -151,13 +151,13 @@ export class Convict {
     }
 
     // 通常攻撃ダメージ
-    calculateOneTimeFinalAttackDamage(convict, enemyDef, isCoreBroken) {
-        return this.calculateOneTimeFinalDamage(convict, ATTACK_TYPE.NORMAL, enemyDef, isCoreBroken)
+    calculateOneHitFinalAttackDamage(convict, enemyDef, isCoreBroken) {
+        return this.calculateOneHitFinalDamage(convict, ATTACK_TYPE.NORMAL, enemyDef, isCoreBroken)
     }
 
     // 必殺技ダメージ
-    calculateOneTimeFinalUltDamage(convict) {
-        return this.calculateOneTimeFinalDamage(convict, ATTACK_TYPE.ULT, isCoreBroken)
+    calculateOneHitFinalUltDamage(convict) {
+        return this.calculateOneHitFinalDamage(convict, ATTACK_TYPE.ULT, isCoreBroken)
     }
 
 

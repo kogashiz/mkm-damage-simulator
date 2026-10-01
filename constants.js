@@ -63,6 +63,39 @@ export const EFFECT_TYPE = Object.freeze({
     // MAGIC_DAMAGE_UP: 'MAGIC_DAMAGE_UP',     // 魔法ダメージアップ (%)
 });
 
+// 表示用・デバッグ用 日本語ラベルマップ
+export const EFFECT_TYPE_LABEL = Object.freeze({
+    // --- 1. 最終ATK ---
+    [EFFECT_TYPE.BASE_ATK]: '基礎ATK',
+    [EFFECT_TYPE.ATK_UP]: 'ATKアップ',
+    [EFFECT_TYPE.ATK_DOWN]: 'ATKダウン',
+
+    // --- 2. 最終DEF（物理防御） ---
+    [EFFECT_TYPE.BASE_DEF]: '基礎物理防御 (DEF)',
+    [EFFECT_TYPE.DEF_DOWN]: '敵DEFダウン',
+    [EFFECT_TYPE.PHYSICAL_PENETRATION_DOWN]: '物理貫通',
+
+    // --- 3. 最終MDF（魔法抵抗） ---
+    [EFFECT_TYPE.BASE_MDF]: '基礎魔法抵抗 (MDF)',
+    [EFFECT_TYPE.MDF_DOWN]: '敵MDFダウン',
+    [EFFECT_TYPE.MAGIC_PENETRATION_DOWN]: '魔法貫通',
+
+    // --- 4. ダメージ係数 ---
+    [EFFECT_TYPE.BASE_DAMAGE_COEF]: '基礎ダメージ係数',
+    [EFFECT_TYPE.DAMAGE_COEF_UP]: 'ダメージ係数アップ',
+
+    // --- 5. クリティカル ---
+    [EFFECT_TYPE.CRIT_RATE_UP]: 'クリティカル率アップ',
+    [EFFECT_TYPE.CRIT_DAMAGE_UP]: 'クリティカルダメージアップ',
+
+    // --- 6. その他補正 ---
+    [EFFECT_TYPE.ALL_DAMAGE_UP]: '全ダメージアップ',
+    [EFFECT_TYPE.NORMAL_DAMAGE_UP]: '通常攻撃ダメージアップ',
+    [EFFECT_TYPE.ULT_DAMAGE_UP]: '必殺技ダメージアップ',
+    [EFFECT_TYPE.TAKEN_DAMAGE_UP]: '被ダメージアップ',
+    [EFFECT_TYPE.CORE_BREAKING_DAMAGE_UP]: 'コアブレイク中被ダメージ補正'
+});
+
 /**
  * パーセント数値を小数（割合）に安全に変換するヘルパー関数
  * 例: pct(15) -> 0.15
@@ -86,6 +119,7 @@ export function createBuffMod(attackType, effectType, buffRatio) {
     return {
         attackType: attackType,
         effectType: effectType,
+        effectTypeLabel: EFFECT_TYPE_LABEL[effectType],
         buffRatio: buffRatio,
     };
 }
