@@ -8,33 +8,6 @@ export const convicts = {
 };
 
 /**
- *  入力したコンビクトのステータスに応じたダメージを計算（攻撃速度吟味しての、回数込みで、合計のダメージ？）
- */
-function calculateFinalDamage(convict) {
-    // 1. 最終ATKの算出
-    const finalAtk = calculateFinalAtk(convict);
-
-    // 2. 最終DEF/MDFの算出
-    const finalDef = calculateFinalDef(convict);
-    // const finalMdf = calculateFinalMdf(convict);
-
-    // 3. 最終ダメージ係数の算出
-    const finalDamageMult = calculateFinalDamgeMult(convict);
-
-    // 4. クリティカル補正の算出
-    const finalCriticalMult = calculateFinalCriticalMult(convict);
-
-    // 5. その他補正の算出
-    const etcMult = calculateFinalEtcMult(convict);
-
-    // 6. 最終ダメージ
-    // = (最終ATK - 最終DEF/MDF) × ダメージ係数 × クリティカル × その他補正
-    const finalDamage = (finalAtk - finalDef) * finalDamageMult * finalCriticalMult * etcMult
-
-    return finalDamage;
-}
-
-/**
  * 画面の入力値を読み取り、コンビクトインスタンスを更新して再計算・画面反映を行う
  */
 function updateCalculation() {
@@ -54,11 +27,8 @@ function updateCalculation() {
     convict.setUserData(level, normalLv, ultLv, pas1Lv, pas2Lv);
 
     // 3. インスタンス側のメソッドを使って計算
-    const finalDamage = calculateFinalDamage(convict);
-    // 使ってるところ参考になるかも
-    // const currentAtk = convict.calculateBaseAtk();
-    // const attackType = document.getElementById('attack-type').value;
-    // const skillEffects = convict.getSkillEffects(attackType);
+    // 1回あたりの通常攻撃ダメージ
+    const oneTimeFinalDamage = convict.oneTimeFinalDamage(convict);
 
     // 4. 画面表示の更新（例: 基礎攻撃力の表示）
     const outBaseAtk = document.getElementById('out-base-atk');
@@ -66,7 +36,25 @@ function updateCalculation() {
         outBaseAtk.textContent = currentAtk;
     }
     
-    // （※ ここでさらに敵ステータスとのダメージ計算エンジンを呼び出す）
+    // 4. 計算結果を画面に反映
+    document.getElementById('output-damage').textContent = `${oneTimeFinalDamage.toLocaleString()} Damage`;
+    // document.getElementById('out-base-atk').textContent = currentAtk;
+    // document.getElementById('out-skill-mult').textContent = `${Math.round(result.multiplier * 100)}%`;
+    // document.getElementById('out-def-rate').textContent = `${(result.defRate * 100).toFixed(1)}%`;
+
+    // 5. デバッグ表示 (共通配列構造の可視化)
+    const debugData = {
+        targetConvict: "デモーリー",
+        calculatedAtk: currentAtk,
+        returnedSkillEffects: skillEffects, // スキルが返した効果配列
+        enemyCondition: {
+            def: enemyDef,
+            defFactorRate: `${(result.defRate * 100).toFixed(1)}%`,
+            coreBreakMultiplier: isCoreBroken ? "150%" : "100%"
+        },
+        finalDamagePerHit: result.damage
+    };
+    document.getElementById('debug-json').textContent = JSON.stringify(debugData, null, 2);
 }
 
 // 【① 画面が開いた時（初期化時）に呼び出す】
@@ -78,7 +66,6 @@ window.addEventListener('DOMContentLoaded', () => {
 const inputIds = [
     'select-convict',
     'char-level',
-    'attack-type',
     'normal-skill-lv',
     'ult-skill-lv',
     'pas1-skill-lv',
@@ -93,3 +80,9 @@ inputIds.forEach(id => {
         element.addEventListener('change', updateCalculation);
     }
 });
+
+function test() {
+    alert('worked');
+} 
+
+window.addEventListener('DOMContentLoaded', updateCalculation);

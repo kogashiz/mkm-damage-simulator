@@ -15,7 +15,7 @@ export const EFFECT_CATEGORY = Object.freeze({
  */
 export const ATTACK_TYPE = Object.freeze({
     NORMAL: 'NORMAL',         // 通常攻撃
-    ULT_ATTACK: 'ULT_ATTACK', // 必殺技
+    ULT: 'ULT', // 必殺技
     ALL: 'ALL',               // 通常攻撃、必殺技、パッシブなどすべての場合 そんなのないかも
     // ULT_SKILL: 'ULT_SKILL',   // 必殺技（即時発動ダメージ等）
     // PASSIVE: 'PASSIVE'        // パッシブ技
@@ -73,4 +73,19 @@ export const EFFECT_TYPE = Object.freeze({
  */
 export function toRatio(percentValue) {
     return percentValue / 100;
+}
+
+/**
+ * 効果（Buff）オブジェクトを標準フォーマットで生成するファクトリ関数
+ * @param {string} effectType - EFFECT_TYPEのいずれか
+ * @param {number} value - 補正値 (toRatioなどで割合化した数値)
+ * @param {Object} options - オプション (targetTypeなど)
+ * @returns {Object} 標準化されたModオブジェクト
+ */
+export function createBuffMod(attackType, effectType, buffRatio) {
+    return {
+        attackType: attackType,
+        effectType: effectType,
+        buffRatio: buffRatio,
+    };
 }

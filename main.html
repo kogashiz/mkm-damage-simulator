@@ -98,8 +98,7 @@
     </style>
 </head>
 <body>
-
-    <h1>コンビクト 1発ダメージ計算シミュレーター</h1>
+    <h1>コンビクト ダメージ計算シミュレーター</h1>
     <img src="https://cdn.wikiwiki.jp/to/w/ptn/FrontPage/::ref/PathtonowhereTOP.jpg.webp?rev=ec11501ac7ae8538756916fafc667920&t=20221209030013"
      alt="画像の説明" width="300" height="200">
     <img src="zoya.png"
@@ -171,7 +170,7 @@
     </div>
 
     <div class="result-box">
-        <div class="result-title">デモーリー 通常攻撃 1発あたりの与えるダメージ:</div>
+        <div class="result-title">通常攻撃 1発あたりの与えるダメージ:</div>
         <div class="result-value" id="output-damage">0 Damage</div>
 
         <div style="margin-top: 10px; font-size: 13px; color: #475569;">
@@ -189,176 +188,166 @@
         /**
          * 各コンビクトのマスターステータス定義
          */
-        const DEMOLIA_MASTER = {
-            name: "デモーリー",
-            damageType: "PHYSICAL", // 物理ダメージタイプ
-            // Lv1およびLv90時の基礎攻撃力 
-            baseAtkLv1: 108,
-            baseAtkLv90: 431,
-            // 通常攻撃倍率: Lv1で100% (1.0)、Lv10で180% (1.8)
-            normalBaseMult: [0.19, 0.27, 0.36, 0.45, 0.55, 0.66, 0.77, 0.89, 1.01, 1.15],
-            ultBaseMult: [0.19, 0.27, 0.36, 0.45, 0.55, 0.66, 0.77, 0.89, 1.01, 1.15]
-        };
-
-        /**
-         * レベルに応じた基礎攻撃力を線形補間計算する関数
-         */
-        function calculateBaseAtk(inputLevel) {
-            const atkGap = DEMOLIA_MASTER.baseAtkLv90 - DEMOLIA_MASTER.baseAtkLv1;
-            const atkPerLv = (DEMOLIA_MASTER.baseAtkLv90 - DEMOLIA_MASTER.baseAtkLv1) / 89;
-            const absentAtkLv = 90 - inputLevel;
-            return Math.floor(DEMOLIA_MASTER.baseAtkLv90 - (atkPerLv * absentAtkLv));
-        }
+        // const DEMOLIA_MASTER = {
+        //     name: "デモーリー",
+        //     damageType: "PHYSICAL", // 物理ダメージタイプ
+        //     // Lv1およびLv90時の基礎攻撃力 
+        //     baseAtkLv1: 108,
+        //     baseAtkLv90: 431,
+        //     // 通常攻撃倍率: Lv1で100% (1.0)、Lv10で180% (1.8)
+        //     normalBaseMult: [0.19, 0.27, 0.36, 0.45, 0.55, 0.66, 0.77, 0.89, 1.01, 1.15],
+        //     ultBaseMult: [0.19, 0.27, 0.36, 0.45, 0.55, 0.66, 0.77, 0.89, 1.01, 1.15]
+        // };
 
         /**
          * 【共通ロジック】スキルを使用した際、「どのような効果（ダメージ/バフ）」が発生するかを
          * 配列 (オブジェクトのリスト) で返す関数
          */
-        function getSkillEffects(skillType, normalLv, ultLv) {
-            const effects = [];
+        // function getSkillEffects(skillType, normalLv, ultLv) {
+        //     const effects = [];
 
-            if (skillType === 'NORMAL') {
-                // 通常攻撃の倍率算出
-                const multiplier = (1 + DEMOLIA_MASTER.normalBaseMult[normalLv - 1]);
+        //     if (skillType === 'NORMAL') {
+        //         // 通常攻撃の倍率算出
+        //         const multiplier = (1 + DEMOLIA_MASTER.normalBaseMult[normalLv - 1]);
 
-                // ダメージ効果を配列に追加して返す
-                effects.push({
-                    effectType: 'DAMAGE',      // ダメージをあたえる効果
-                    damageType: 'PHYSICAL',    // 物理ダメージ
-                    multiplier: multiplier,   // スキル倍率
-                    hits: 1                   // 1ヒット
-                });
-            } else if (skillType === 'ULTIMATE') {
-                // デモーリーの必殺技は「自己回復＆最大HP増加バフ」
-                effects.push({
-                    effectType: 'BUFF',        // バフ効果
-                    target: 'SELF',            // 自分自身
-                    stat: 'MAX_HP',            // 最大HP増加
-                    value: 0.15 + (ultLv * 0.02) // 回復/バフ率
-                });
-            }
+        //         // ダメージ効果を配列に追加して返す
+        //         effects.push({
+        //             effectType: 'DAMAGE',      // ダメージをあたえる効果
+        //             damageType: 'PHYSICAL',    // 物理ダメージ
+        //             multiplier: multiplier,   // スキル倍率
+        //             hits: 1                   // 1ヒット
+        //         });
+        //     } else if (skillType === 'ULTIMATE') {
+        //         // デモーリーの必殺技は「自己回復＆最大HP増加バフ」
+        //         effects.push({
+        //             effectType: 'BUFF',        // バフ効果
+        //             target: 'SELF',            // 自分自身
+        //             stat: 'MAX_HP',            // 最大HP増加
+        //             value: 0.15 + (ultLv * 0.02) // 回復/バフ率
+        //         });
+        //     }
 
-            return effects;
-        }
+        //     return effects;
+        // }
 
         /**
          * 【共通計算エンジン】敵ステータスと「効果配列」を受け取り、1発の最終ダメージを計算する関数
          */
-        function calculateDamageEngine(atk, effects, enemyDef, enemyMdf, isCoreBroken) {
-            let totalHitDamage = 0;
-            let appliedMultiplier = 0;
-            let defRate = 0;
+        // function calculateDamageEngine(atk, effects, enemyDef, enemyMdf, isCoreBroken) {
+        //     let totalHitDamage = 0;
+        //     let appliedMultiplier = 0;
+        //     let defRate = 0;
 
-            // コアブレイク時の被ダメ倍率 (150% = 1.5)
-            const coreMultiplier = isCoreBroken ? 1.5 : 1.0;
+        //     // コアブレイク時の被ダメ倍率 (150% = 1.5)
+        //     const coreMultiplier = isCoreBroken ? 1.5 : 1.0;
 
-            // 敵の物理防御力による被ダメージ率 (1000 / (1000 + DEF))
-            const defFactor = 1000 / (1000 + enemyDef);
-            defRate = defFactor;
+        //     // 敵の物理防御力による被ダメージ率 (1000 / (1000 + DEF))
+        //     const defFactor = 1000 / (1000 + enemyDef);
+        //     defRate = defFactor;
 
-            // スキルから返された効果リストを巡回して計算
-            effects.forEach(effect => {
-                if (effect.effectType === 'DAMAGE') {
-                    appliedMultiplier = effect.multiplier;
+        //     // スキルから返された効果リストを巡回して計算
+        //     effects.forEach(effect => {
+        //         if (effect.effectType === 'DAMAGE') {
+        //             appliedMultiplier = effect.multiplier;
 
-                    // 1発のダメージ公式 = 攻撃力 × スキル倍率 × 敵防御減算率 × コアブレイク倍率
-                    const singleHit = atk * effect.multiplier * defFactor * coreMultiplier;
-                    totalHitDamage += singleHit;
-                }
-            });
+        //             // 1発のダメージ公式 = 攻撃力 × スキル倍率 × 敵防御減算率 × コアブレイク倍率
+        //             const singleHit = atk * effect.multiplier * defFactor * coreMultiplier;
+        //             totalHitDamage += singleHit;
+        //         }
+        //     });
 
-            return {
-                damage: Math.floor(totalHitDamage),
-                multiplier: appliedMultiplier,
-                defRate: defRate
-            };
-        }
+        //     return {
+        //         damage: Math.floor(totalHitDamage),
+        //         multiplier: appliedMultiplier,
+        //         defRate: defRate
+        //     };
+        // }
 
         /**
          * 画面上の入力値を取得し、再計算して表示を更新するメイン関数
          */
-        function updateCalculation() {
-            // 入力要素の値を取得
-            const convictKey = document.getElementById('select-convict').value;
-            const level = parseInt(document.getElementById('char-level').value) || 1;
-            const normalLv = parseInt(document.getElementById('normal-skill-lv').value) || 1;
-            const ultLv = parseInt(document.getElementById('ult-skill-lv').value) || 1;
-            const pas1Lv = parseInt(document.getElementById('pas1-skill-lv').value) || 1;
-            const pas2Lv = parseInt(document.getElementById('pas2-skill-lv').value) || 1;
+        // function updateCalculation() {
+        //     // 入力要素の値を取得
+        //     const convictKey = document.getElementById('select-convict').value;
+        //     const level = parseInt(document.getElementById('char-level').value) || 1;
+        //     const normalLv = parseInt(document.getElementById('normal-skill-lv').value) || 1;
+        //     const ultLv = parseInt(document.getElementById('ult-skill-lv').value) || 1;
+        //     const pas1Lv = parseInt(document.getElementById('pas1-skill-lv').value) || 1;
+        //     const pas2Lv = parseInt(document.getElementById('pas2-skill-lv').value) || 1;
 
-            const enemyHp = parseInt(document.getElementById('enemy-hp').value) || 0;
-            const enemyDef = parseInt(document.getElementById('enemy-def').value) || 0;
-            const enemyMdf = parseInt(document.getElementById('enemy-mdf').value) || 0;
-            const isCoreBroken = document.getElementById('is-core-broken').checked;
+        //     const enemyHp = parseInt(document.getElementById('enemy-hp').value) || 0;
+        //     const enemyDef = parseInt(document.getElementById('enemy-def').value) || 0;
+        //     const enemyMdf = parseInt(document.getElementById('enemy-mdf').value) || 0;
+        //     const isCoreBroken = document.getElementById('is-core-broken').checked;
 
-            /// 変更部ここから
-            const selectedConvict = getConvictInfo(convictKey, level, normalLv, ultLv, pas1Lv, pas2Lv);
-            // 1. 最終ATKの算出
-            const finalAtk = calculateFinalAtk(selectedConvict);
+        //     /// 変更部ここから
+        //     const selectedConvict = getConvictInfo(convictKey, level, normalLv, ultLv, pas1Lv, pas2Lv);
+        //     // 1. 最終ATKの算出
+        //     const finalAtk = calculateFinalAtk(selectedConvict);
 
-            // 2. 最終DEF/MDFの算出
-            const finalDef = calculateFinalDef(selectedConvict);
-            // const finalMdf = calculateFinalMdf(selectedConvict);
+        //     // 2. 最終DEF/MDFの算出
+        //     const finalDef = calculateFinalDef(selectedConvict);
+        //     // const finalMdf = calculateFinalMdf(selectedConvict);
 
-            // 3. 最終ダメージ係数の算出
-            const finalDamageMult = calculateFinalDamgeMult(selectedConvict);
+        //     // 3. 最終ダメージ係数の算出
+        //     const finalDamageMult = calculateFinalDamgeMult(selectedConvict);
 
-            // 4. クリティカル補正の算出
-            const finalCriticalMult = calculateFinalCriticalMult(selectedConvict);
+        //     // 4. クリティカル補正の算出
+        //     const finalCriticalMult = calculateFinalCriticalMult(selectedConvict);
 
-            // 5. その他補正の算出
-            const etcMult = calculateFinalEtcMult(selectedConvict);
+        //     // 5. その他補正の算出
+        //     const etcMult = calculateFinalEtcMult(selectedConvict);
 
-            // 6. 最終ダメージ
-            // = (最終ATK - 最終DEF/MDF) × ダメージ係数 × クリティカル × その他補正
-            const finalDamage = (finalAtk - finalDef) * finalDamageMult * finalCriticalMult * etcMult
+        //     // 6. 最終ダメージ
+        //     // = (最終ATK - 最終DEF/MDF) × ダメージ係数 × クリティカル × その他補正
+        //     const finalDamage = (finalAtk - finalDef) * finalDamageMult * finalCriticalMult * etcMult
 
-            /// 変更部ここまで
+        //     /// 変更部ここまで
 
-            // 1. 基礎ステータスの算出
-            const currentAtk = calculateBaseAtk(level);
+        //     // 1. 基礎ステータスの算出
+        //     const currentAtk = calculateBaseAtk(level);
 
-            // 2. 通常攻撃の「効果配列（イベントデータ）」を取得
-            const skillEffects = getSkillEffects('NORMAL', normalLv, ultLv);
+        //     // 2. 通常攻撃の「効果配列（イベントデータ）」を取得
+        //     const skillEffects = getSkillEffects('NORMAL', normalLv, ultLv);
 
-            // 3. 共通計算エンジンで1発のダメージを計算
-            const result = calculateDamageEngine(currentAtk, skillEffects, enemyDef, enemyMdf, isCoreBroken);
+        //     // 3. 共通計算エンジンで1発のダメージを計算
+        //     const result = calculateDamageEngine(currentAtk, skillEffects, enemyDef, enemyMdf, isCoreBroken);
 
-            // 4. 計算結果を画面に反映
-            document.getElementById('output-damage').textContent = `${result.damage.toLocaleString()} Damage`;
-            document.getElementById('out-base-atk').textContent = currentAtk;
-            document.getElementById('out-skill-mult').textContent = `${Math.round(result.multiplier * 100)}%`;
-            document.getElementById('out-def-rate').textContent = `${(result.defRate * 100).toFixed(1)}%`;
+        //     // 4. 計算結果を画面に反映
+        //     document.getElementById('output-damage').textContent = `${result.damage.toLocaleString()} Damage`;
+        //     document.getElementById('out-base-atk').textContent = currentAtk;
+        //     document.getElementById('out-skill-mult').textContent = `${Math.round(result.multiplier * 100)}%`;
+        //     document.getElementById('out-def-rate').textContent = `${(result.defRate * 100).toFixed(1)}%`;
 
-            // 5. デバッグ表示 (共通配列構造の可視化)
-            const debugData = {
-                targetConvict: "デモーリー",
-                calculatedAtk: currentAtk,
-                returnedSkillEffects: skillEffects, // スキルが返した効果配列
-                enemyCondition: {
-                    def: enemyDef,
-                    defFactorRate: `${(result.defRate * 100).toFixed(1)}%`,
-                    coreBreakMultiplier: isCoreBroken ? "150%" : "100%"
-                },
-                finalDamagePerHit: result.damage
-            };
-            document.getElementById('debug-json').textContent = JSON.stringify(debugData, null, 2);
-        }
+        //     // 5. デバッグ表示 (共通配列構造の可視化)
+        //     const debugData = {
+        //         targetConvict: "デモーリー",
+        //         calculatedAtk: currentAtk,
+        //         returnedSkillEffects: skillEffects, // スキルが返した効果配列
+        //         enemyCondition: {
+        //             def: enemyDef,
+        //             defFactorRate: `${(result.defRate * 100).toFixed(1)}%`,
+        //             coreBreakMultiplier: isCoreBroken ? "150%" : "100%"
+        //         },
+        //         finalDamagePerHit: result.damage
+        //     };
+        //     document.getElementById('debug-json').textContent = JSON.stringify(debugData, null, 2);
+        // }
 
         // イベントリスナーの登録（値が変わった時に即座に再計算）
-        const inputs = [
-            'char-level', 'normal-skill-lv', 'ult-skill-lv', 'pas1-skill-lv', 'pas2-skill-lv',
-            'enemy-hp', 'enemy-def', 'enemy-mdf', 'is-core-broken'
-        ];
+        // const inputs = [
+        //     'char-level', 'normal-skill-lv', 'ult-skill-lv', 'pas1-skill-lv', 'pas2-skill-lv',
+        //     'enemy-hp', 'enemy-def', 'enemy-mdf', 'is-core-broken'
+        // ];
 
-        inputs.forEach(id => {
-            const elem = document.getElementById(id);
-            elem.addEventListener('input', updateCalculation);
-            elem.addEventListener('change', updateCalculation);
-        });
+        // inputs.forEach(id => {
+        //     const elem = document.getElementById(id);
+        //     elem.addEventListener('input', updateCalculation);
+        //     elem.addEventListener('change', updateCalculation);
+        // });
 
         // 初回起動時の計算を実行
-        window.addEventListener('DOMContentLoaded', updateCalculation);
+        // window.addEventListener('DOMContentLoaded', updateCalculation);
     </script>
 </body>
 </html>

@@ -1,3 +1,5 @@
+import { ATTACK_TYPE, EFFECT_TYPE } from './Constants.js';
+
 // 基底クラス（まだあるとよくなるプログラムの流れがわかってない）
 export class Convict {
     /**
@@ -39,8 +41,9 @@ export class Convict {
 
     /** 画面で入力したレベルに応じた攻撃力の計算  線形想定 */
     calculateBaseAtk(level) {
-        // const gap = this.baseAtkLv90 - this.baseAtkLv1;
-        // return Math.round(this.baseAtkLv1 + (gap * (level - 1) / 89));
+        const atkPerLv = (DEMOLIA_MASTER.baseAtkLv90 - DEMOLIA_MASTER.baseAtkLv1) / 89;
+        const absentAtkLv = 90 - inputLevel;
+        return Math.floor(DEMOLIA_MASTER.baseAtkLv90 - (atkPerLv * absentAtkLv));
     }
 
     /** スキル効果の取得（子クラスで上書きする）⇒ 用途よくわかってないので一旦コメントアウト */
@@ -53,4 +56,74 @@ export class Convict {
             etcMods: []       // ダメージアップ系、被ダメージアップ系、ダメージダウン系、被ダメージダウン系、コア状態被ダメージ補正
         };
     }
+
+    // ダメージ計算で使う最終的なATKの計算
+    calculateFinalAtk(convict) {
+        const atkMods = convict.getBuffMods().atkMods;
+        // atkModsのEFFECT_TYPEを見て、基礎atkを足し引きする
+        
+        return 10; // dummy
+    }
+
+    // ダメージ計算で使う最終的なDEFの計算
+    calculateFinalDef(convict) {
+
+        return 10; // dummy
+    }
+
+    // ダメージ計算で使う最終的なダメージ係数の計算
+    calculateFinalDamageMult(convict, attackType) {
+        const damageMods = convict.getBuffMods().damageMods;
+        // 通常攻撃なら通常攻撃のスキル倍率、必殺技ならそのスキル倍率をそれぞれ返す
+        const matchedMod = damageMods.find(mod => mod.attackType === attackType);
+        // もし該当の倍率がなければ、エラーを示すために-1を返す
+        return matchedMod ? matchedMod : -1;
+    }
+
+    // ダメージ計算で使う最終的なクリティカル補正の計算
+    calculateFinalCriticalMult(convict) {
+        return 1; // dummy
+    }
+
+    // ダメージ計算で使う最終的なその他色々補正の計算
+    calculateFinalEtcMult(convict) {
+        return 1; // dummy
+    }
+
+    // 通常攻撃ダメージ
+    calculateOneTimeFinalAttackDamage(convict) {
+        return calculateOneTimeFinalDamage(convict, ATTACK_TYPE.NORMAL)
+    }
+
+    // 必殺技ダメージ
+    calculateOneTimeFinalUltDamage(convict) {
+        return calculateOneTimeFinalDamage(convict, ATTACK_TYPE.ULT)
+    }
+
+    /**
+     * ダメージ計算式。共通
+     */
+    calculateOneTimeFinalDamage(convict, attackType) {
+    // 1. 最終ATKの算出
+    const finalAtk = calculateFinalAtk(convict);
+
+    // 2. 最終DEF/MDFの算出
+    const finalDef = calculateFinalDef(convict);
+    // const finalMdf = calculateFinalMdf(convict);
+
+    // 3. 最終ダメージ係数の算出
+    const finalDamageMult = calculateFinalDamageMult(convict, attackType);
+
+    // 4. クリティカル補正の算出
+    const finalCriticalMult = calculateFinalCriticalMult(convict);
+
+    // 5. その他補正の算出
+    const etcMult = calculateFinalEtcMult(convict);
+
+    // 6. 最終ダメージ
+    // = (最終ATK - 最終DEF/MDF) × ダメージ係数 × クリティカル × その他補正
+    const finalDamage = (finalAtk - finalDef) * finalDamageMult * finalCriticalMult * etcMult
+
+    return finalDamage;
+}
 }

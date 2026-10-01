@@ -1,4 +1,5 @@
-import { EFFECT_TYPE, ATTACK_TYPE, toRatio } from './constants.js';
+import { ATTACK_TYPE, EFFECT_TYPE, toRatio, createBuffMod } from './Constants.js';
+import { Convict } from './Convict.js';
 
 /**
  * NOX（子クラス）の実装例
@@ -86,29 +87,11 @@ export class Nox extends Convict {
         };
 
         // 通常攻撃
-        const normalPercent = Nox.NORMAL_SKILL_PCT[this.normalLv]
-        buffs.damageMods.push({
-            
-        })
+        const normalPercent = Nox.NORMAL_SKILL_PCT[this.normalLv];
+        buffs.damageMods.push(
+            createBuffMod(ATTACK_TYPE.NORMAL, EFFECT_TYPE.BASE_DAMAGE_COEF, toRatio(normalPercent))
+        )
         
-        
-        // 自身のインスタンスに保持されている this.pas2Lv を参照
-        const defDebuffRatio = 0.15 + ((this.pas2Lv - 1) * 0.01);
-        buffs.push({
-            effectType: 'DEBUFF',
-            target: 'ENEMY',
-            stat: 'DEF_DOWN',
-            ratio: defDebuffRatio
-        });
-        
-        if (attackType === 'NORMAL') {
-            const multiplier = 0.90 + (0.07 * (this.normalLv - 1));
-            buffs.push({
-                effectType: 'DAMAGE',
-                damageType: 'PHYSICAL',
-                multiplier: multiplier
-            });
-        }
         
         return buffs;
     }
