@@ -28,13 +28,11 @@ function updateCalculation() {
 
     // 3. インスタンス側のメソッドを使って計算
     // 1回あたりの通常攻撃ダメージ
-    const oneTimeFinalDamage = convict.oneTimeFinalDamage(convict);
+    const oneTimeFinalDamage = convict.calculateOneTimeFinalAttackDamage(convict);
 
     // 4. 画面表示の更新（例: 基礎攻撃力の表示）
     const outBaseAtk = document.getElementById('out-base-atk');
-    if (outBaseAtk) {
-        outBaseAtk.textContent = currentAtk;
-    }
+    outBaseAtk.textContent = convict.baseAtk;
     
     // 4. 計算結果を画面に反映
     document.getElementById('output-damage').textContent = `${oneTimeFinalDamage.toLocaleString()} Damage`;
@@ -45,14 +43,14 @@ function updateCalculation() {
     // 5. デバッグ表示 (共通配列構造の可視化)
     const debugData = {
         targetConvict: "デモーリー",
-        calculatedAtk: currentAtk,
-        returnedSkillEffects: skillEffects, // スキルが返した効果配列
-        enemyCondition: {
-            def: enemyDef,
-            defFactorRate: `${(result.defRate * 100).toFixed(1)}%`,
-            coreBreakMultiplier: isCoreBroken ? "150%" : "100%"
-        },
-        finalDamagePerHit: result.damage
+        calculatedAtk: convict.baseAtk,
+        returnedSkillEffects: convict.getBuffMods(), // スキルが返した効果配列
+        // enemyCondition: {
+        //     def: enemyDef,
+        //     defFactorRate: `${(result.defRate * 100).toFixed(1)}%`,
+        //     coreBreakMultiplier: isCoreBroken ? "150%" : "100%"
+        // },
+        // finalDamagePerHit: result.damage
     };
     document.getElementById('debug-json').textContent = JSON.stringify(debugData, null, 2);
 }

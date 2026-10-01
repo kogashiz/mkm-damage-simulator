@@ -22,6 +22,7 @@ export class Convict {
         // 画面からの入力値を保持する、super()した直後は未初期化状態のため、初期値-1とする
         // 多分ここに追加：専属とか刻印とか
         this.level = -1;
+        this.baseAtk = -1;
         this.normalLv = -1;
         this.ultLv = -1;
         this.pas1Lv = -1;
@@ -33,6 +34,7 @@ export class Convict {
      */
     setUserData(level, normalLv, ultLv, pas1Lv, pas2Lv) {
         this.level = level;
+        this.baseAtk = this.calculateBaseAtk(level);
         this.normalLv = normalLv;
         this.ultLv = ultLv;
         this.pas1Lv = pas1Lv;
@@ -41,9 +43,9 @@ export class Convict {
 
     /** 画面で入力したレベルに応じた攻撃力の計算  線形想定 */
     calculateBaseAtk(level) {
-        const atkPerLv = (DEMOLIA_MASTER.baseAtkLv90 - DEMOLIA_MASTER.baseAtkLv1) / 89;
-        const absentAtkLv = 90 - inputLevel;
-        return Math.floor(DEMOLIA_MASTER.baseAtkLv90 - (atkPerLv * absentAtkLv));
+        const atkPerLv = (this.baseAtkLv90 - this.baseAtkLv1) / 89;
+        const absentAtkLv = 90 - this.level;
+        return Math.floor(this.baseAtkLv90 - (atkPerLv * absentAtkLv));
     }
 
     /** スキル効果の取得（子クラスで上書きする）⇒ 用途よくわかってないので一旦コメントアウト */
@@ -90,40 +92,42 @@ export class Convict {
         return 1; // dummy
     }
 
-    // 通常攻撃ダメージ
-    calculateOneTimeFinalAttackDamage(convict) {
-        return calculateOneTimeFinalDamage(convict, ATTACK_TYPE.NORMAL)
-    }
-
-    // 必殺技ダメージ
-    calculateOneTimeFinalUltDamage(convict) {
-        return calculateOneTimeFinalDamage(convict, ATTACK_TYPE.ULT)
-    }
-
     /**
      * ダメージ計算式。共通
      */
     calculateOneTimeFinalDamage(convict, attackType) {
-    // 1. 最終ATKの算出
-    const finalAtk = calculateFinalAtk(convict);
+        // 1. 最終ATKの算出
+        const finalAtk = this.calculateFinalAtk(convict);
 
-    // 2. 最終DEF/MDFの算出
-    const finalDef = calculateFinalDef(convict);
-    // const finalMdf = calculateFinalMdf(convict);
+        // 2. 最終DEF/MDFの算出
+        const finalDef = this.calculateFinalDef(convict);
+        // const finalMdf = calculateFinalMdf(convict);
 
-    // 3. 最終ダメージ係数の算出
-    const finalDamageMult = calculateFinalDamageMult(convict, attackType);
+        // 3. 最終ダメージ係数の算出
+        const finalDamageMult = this.calculateFinalDamageMult(convict, attackType);
 
-    // 4. クリティカル補正の算出
-    const finalCriticalMult = calculateFinalCriticalMult(convict);
+        // 4. クリティカル補正の算出
+        const finalCriticalMult = this.calculateFinalCriticalMult(convict);
 
-    // 5. その他補正の算出
-    const etcMult = calculateFinalEtcMult(convict);
+        // 5. その他補正の算出
+        const etcMult = this.calculateFinalEtcMult(convict);
 
-    // 6. 最終ダメージ
-    // = (最終ATK - 最終DEF/MDF) × ダメージ係数 × クリティカル × その他補正
-    const finalDamage = (finalAtk - finalDef) * finalDamageMult * finalCriticalMult * etcMult
+        // 6. 最終ダメージ
+        // = (最終ATK - 最終DEF/MDF) × ダメージ係数 × クリティカル × その他補正
+        const finalDamage = (finalAtk - finalDef) * finalDamageMult * finalCriticalMult * etcMult
 
-    return finalDamage;
-}
+        return finalDamage;
+    }
+
+    // 通常攻撃ダメージ
+    calculateOneTimeFinalAttackDamage(convict) {
+        return this.calculateOneTimeFinalDamage(convict, ATTACK_TYPE.NORMAL)
+    }
+
+    // 必殺技ダメージ
+    calculateOneTimeFinalUltDamage(convict) {
+        return this.calculateOneTimeFinalDamage(convict, ATTACK_TYPE.ULT)
+    }
+
+
 }
