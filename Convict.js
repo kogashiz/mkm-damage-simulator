@@ -71,15 +71,22 @@ export class Convict {
 
     // ダメージ計算で使う最終的なDEFの計算
     calculateFinalDef(convict, enemyDef) {
-        let finalDef = enemyDef;
         const defMods = convict.getBuffMods().defMods;
+        let totalDefDown = 0;
+        let totalPhyDown = 0;
         for (const mod of defMods) {
-            // 物理貫通はdefを割合分下げる
-            if (mod.effectType === EFFECT_TYPE.PHYSICAL_PENETRATION_UP) {
-                finalDef *= (1 - mod.buffRatio);
+            // DEFダウン
+            if (mod.effectType === EFFECT_TYPE.DEF_DOWN) {
+                totalDefDown += mod.buffRatio;
+                continue;
+            }
+            // 物理貫通
+            if (mod.effectType === EFFECT_TYPE.PHYSICAL_PENETRATION_DOWN) {
+                totalPhyDown += mod.buffRatio;
+                continue;
             }
         }
-        return finalDef;
+        return enemyDef * (1 - totalDefDown) * (1 - totalPhyDown);
     }
 
     // ダメージ計算で使う最終的なダメージ係数の計算

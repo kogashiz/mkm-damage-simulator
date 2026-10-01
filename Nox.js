@@ -38,7 +38,7 @@ export class Nox extends Convict {
     ]);
 
     // パッシブ1 魂の侵蝕
-    static PASS1_SKILL_PCT = Object.freeze([
+    static PAS1_SKILL_PCT = Object.freeze([
         0,   // Lv0 (未使用)
         15, // Lv1
         16, // Lv2
@@ -53,7 +53,7 @@ export class Nox extends Convict {
     ]);
 
     // パッシブ2 幽冥戦慄
-    static PASS2_SKILL_PCT = Object.freeze([
+    static PAS2_SKILL_PCT = Object.freeze([
         0,    // Lv0 (未使用)
         15,   // Lv1
         16,   // Lv2
@@ -99,20 +99,32 @@ export class Nox extends Convict {
         // 狂瞳深化
         // 物理貫通15%UP
         buffs.defMods.push(
-            createBuffMod(ATTACK_TYPE.NOT_ATTACK, EFFECT_TYPE.PHYSICAL_PENETRATION_UP, toRatio(15))
+            createBuffMod(ATTACK_TYPE.NOT_ATTACK, EFFECT_TYPE.PHYSICAL_PENETRATION_DOWN, toRatio(15))
         );
 
-        // ATK補正
+        // ATK補正（通常ステータスのATK含む）
         buffs.atkMods.push(
             createBuffMod(ATTACK_TYPE.NOT_ATTACK, EFFECT_TYPE.BASE_ATK, this.baseAtk)
         )
 
-        // 通常攻撃
+        // 通常攻撃（通常攻撃のスキル倍率のこと）
         const normalPercent = Nox.NORMAL_SKILL_PCT[this.normalLv];
         buffs.damageMods.push(
             createBuffMod(ATTACK_TYPE.NORMAL, EFFECT_TYPE.BASE_DAMAGE_COEF, toRatio(normalPercent))
         )
-        
+
+        // 必殺技 ややこしいのであとで
+
+
+        // パッシブ1 ややこしいし頻出バフじゃないのでもっと後回し
+
+
+        // パッシブ2 DEFダウン（そういえば再構築でバフ変わるけど一旦無視）
+        const pas2Percent = Nox.PAS2_SKILL_PCT[this.pas2Lv];
+        buffs.defMods.push(
+            createBuffMod(ATTACK_TYPE.NOT_ATTACK, EFFECT_TYPE.DEF_DOWN, toRatio(pas2Percent))
+        );
+                
         
         return buffs;
     }

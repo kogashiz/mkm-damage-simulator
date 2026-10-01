@@ -1,16 +1,4 @@
 /**
- * 計算項目の大カテゴリ（どの補正リストに格納するか）
- */
-export const EFFECT_CATEGORY = Object.freeze({
-    ATK: 'atkMods',               // 最終ATK
-    DEF: 'defMods',               // 最終DEF（物理防御）
-    MDF: 'mdfMods',               // 最終MDF（魔法抵抗）
-    DAMAGE_COEF: 'damageMods',    // ダメージ係数 (スキル倍率など)
-    CRIT: 'critMods',             // クリティカル
-    ETC: 'etcMods'                // その他補正 (与ダメ/被ダメ/コア等)
-});
-
-/**
  * 攻撃種別の定義
  */
 export const ATTACK_TYPE = Object.freeze({
@@ -20,6 +8,18 @@ export const ATTACK_TYPE = Object.freeze({
     NOT_ATTACK: 'NOT_ATTACK',             // 通常ATKなどのステータス、パッシブステータス
     // ULT_SKILL: 'ULT_SKILL',   // 必殺技（即時発動ダメージ等）
     // PASSIVE: 'PASSIVE'        // パッシブ技
+});
+
+/**
+ * 計算項目の大カテゴリ（どの補正リストに格納するか）
+ */
+export const EFFECT_CATEGORY = Object.freeze({
+    ATK: 'atkMods',               // 最終ATK
+    DEF: 'defMods',               // 最終DEF（物理防御）
+    MDF: 'mdfMods',               // 最終MDF（魔法抵抗）
+    DAMAGE_COEF: 'damageMods',    // ダメージ係数 (スキル倍率など)
+    CRIT: 'critMods',             // クリティカル
+    ETC: 'etcMods'                // その他補正 (与ダメ/被ダメ/コア等)
 });
 
 /**
@@ -36,13 +36,13 @@ export const EFFECT_TYPE = Object.freeze({
     BASE_DEF: 'BASE_DEF',               // 基礎物理防御 (DEF)
     // DEF_UP: 'DEF_UP',                   // DEFアップ (%) コンビクトの能力上昇は敵と関係ないので
     DEF_DOWN: 'DEF_DOWN',               // 敵DEFダウン (%) -> 例: NOXパッシブ2
-    PHYSICAL_PENETRATION_UP: 'PHYSICAL_PENETRATION_UP', // 物理貫通 (%)
+    PHYSICAL_PENETRATION_DOWN: 'PHYSICAL_PENETRATION_DOWN', // 物理貫通 (%)
 
     // --- 3. 最終MDF（魔法抵抗） ---
     BASE_MDF: 'BASE_MDF',               // 基礎魔法抵抗 (MDF)
     // MDF_UP: 'MDF_UP',                   // MDFアップ (%)
     MDF_DOWN: 'MDF_DOWN',               // 敵MDFダウン (%)
-    MAGIC_PENETRATION_UP: 'MAGIC_PENETRATION_UP',       // 魔法貫通 (%)
+    MAGIC_PENETRATION_DOWN: 'MAGIC_PENETRATION_DOWN',       // 魔法貫通 (%)
 
     // --- 4. ダメージ係数 ---
     BASE_DAMAGE_COEF: 'BASE_DAMAGE_COEF', // 基礎ダメージ係数
