@@ -128,5 +128,62 @@ export class Nox extends Convict {
         
         return buffs;
     }
+
+    // 先に倍率計算をできるようにするため、一旦スキップ
+    /*
+    simulateAttack(battleSeconds, enemyDef, isCoreBroken) {
+        let finalDamage = 0;
+
+        // 戦闘中の攻撃順序（プレイヤーの操作手順）
+        const timeline = [
+            { time: 45, action: 'USE_ULT' }, // 45秒目に必殺技発動（EG消費45）
+            { time: 48, action: 'CORE_BREAK'},
+        ];
+
+        let isUltActive = false; // 必殺技モード中かどうか
+        let ultRemainingTime = 0; // 必殺技の残り時間
+
+        for (let second = this.attackSpeed; second <= battleSeconds; second = second + this.attackSpeed) {
+            // タイムラインをチェック 指定時間になったら特定のアクションを実行
+            const currentAction = timeline.find(item => item.time <= second );
+            if (currentAction?.action === 'USE_ULT') {
+                // 必殺技中は必殺技初期値を設定しないよね
+                if (!isUltActive) {
+                    isUltActive = true;
+                    ultRemainingTime = 20; // NOXの必殺技は20秒間持続
+                }
+            }
+
+            // 通常攻撃/必殺技状態に応じた攻撃判定
+            // 必殺技
+            if (isUltActive) {
+                // 1秒に2回攻撃するとする（薙ぎ払い行き返り）
+                finalDamage += this.calculateOneHitFinalUltDamage(this, enemyDef, isCoreBroken);
+                ultRemainingTime -= this.attackSpeed;
+                // 20秒たったら通常攻撃に戻る
+                if (ultRemainingTime <= 0) {
+                    isUltActive = false;
+                }
+
+            } else {
+                // 通常攻撃
+                finalDamage += this.calculateOneHitFinalAttackDamage(this, enemyDef, isCoreBroken);
+
+            }
+        }
+
+        return finalDamage;
+
+        // // 通常攻撃を与える回数
+        // const hitCount = Math.floor(battleSeconds / this.attackSpeed);
+        // // 1回あたりの通常攻撃ダメージ
+        // const oneHitFinalDamage = this.calculateOneHitFinalAttackDamage(this, enemyDef, isCoreBroken);
+        // // 合計通常攻撃ダメージ
+        // // const finalDamage = hitCount * oneHitFinalDamage;
+        // // 設定した戦闘時間中に必殺技が何回打てるか
+        // const ultCount = Math.floor(battleSeconds / this.ultEnergyCost);
+        // console.log(ultCount);
+    }
+    */
     
 }

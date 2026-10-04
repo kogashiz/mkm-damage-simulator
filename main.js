@@ -33,6 +33,9 @@ function updateCalculation() {
     // 3. ダメージを計算インスタンス側のメソッドを使って計算
     // 戦闘時間を取得
     const seconds = getBattleTimeInSeconds();
+    // コンビクトごとの攻撃機構に渡して、最終的なダメージをもらう（もしくは画面に表示する情報と一緒に返す）
+    const result = convict.simulateAttack(seconds, enemyDef, isCoreBroken);
+
     // 通常攻撃を与える回数
     const hitCount = Math.floor(seconds / convict.attackSpeed);
     // 1回あたりの通常攻撃ダメージ
