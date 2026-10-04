@@ -105,57 +105,82 @@
      alt="画像の説明" width="100" height="100">
 
     <div class="container">
-        <!-- 左側: コンビクト選択・育成ステータス -->
         <div class="card">
-            <h2>1. コンビクト 育成ステータス</h2>
+            <h2>1-1. コンビクト 育成ステータス</h2>
 
             <div class="form-group">
                 <label for="select-convict">対象コンビクト:</label>
-                <select id="select-convict">
-                    <option value="demolia">デモーリー</option>
-                    <option value="nox">NOX</option>
+                <select id="select-cvt1">
+                    <option value="nox" selected>NOX</option>
+                    <option value="shin">シズ</option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label for="char-level">キャラクターレベル (1〜90):</label>
-                <input type="number" id="char-level" value="80" min="1" max="90">
+                <input type="number" id="cvt1-char-level" value="80" min="1" max="90">
             </div>
 
             <div class="form-group">
                 <label for="normal-skill-lv">通常攻撃 スキルLv (1〜10):</label>
-                <input type="number" id="normal-skill-lv" value="7" min="1" max="10">
+                <input type="number" id="cvt1-normal-skill-lv" value="7" min="1" max="10">
             </div>
 
             <div class="form-group">
                 <label for="ult-skill-lv">必殺技 スキルLv (1〜10):</label>
-                <input type="number" id="ult-skill-lv" value="7" min="1" max="10">
+                <input type="number" id="cvt1-ult-skill-lv" value="7" min="1" max="10">
             </div>
 
             <div class="form-group">
                 <label for="pas1-skill-lv">パッシブ1 スキルLv (1〜10):</label>
-                <input type="number" id="pas1-skill-lv" value="7" min="1" max="10">
+                <input type="number" id="cvt1-pas1-skill-lv" value="7" min="1" max="10">
             </div>
 
             <div class="form-group">
                 <label for="pas2-skill-lv">パッシブ2 スキルLv (1〜10):</label>
-                <input type="number" id="pas2-skill-lv" value="7" min="1" max="10">
+                <input type="number" id="cvt1-pas2-skill-lv" value="7" min="1" max="10">
+            </div>
+        </div>
+        <div class="card">
+            <h2>1-2. コンビクト 育成ステータス</h2>
+
+            <div class="form-group">
+                <label for="select-convict">対象コンビクト:</label>
+                <select id="select-cvt2">
+                    <option value="nox">NOX</option>
+                    <option value="shin" selected>シズ</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="char-level">キャラクターレベル (1〜90):</label>
+                <input type="number" id="cvt2-char-level" value="80" min="1" max="90">
+            </div>
+
+            <div class="form-group">
+                <label for="normal-skill-lv">通常攻撃 スキルLv (1〜10):</label>
+                <input type="number" id="cvt2-normal-skill-lv" value="7" min="1" max="10">
+            </div>
+
+            <div class="form-group">
+                <label for="ult-skill-lv">必殺技 スキルLv (1〜10):</label>
+                <input type="number" id="cvt2-ult-skill-lv" value="7" min="1" max="10">
+            </div>
+
+            <div class="form-group">
+                <label for="pas1-skill-lv">パッシブ1 スキルLv (1〜10):</label>
+                <input type="number" id="cvt2-pas1-skill-lv" value="7" min="1" max="10">
+            </div>
+
+            <div class="form-group">
+                <label for="pas2-skill-lv">パッシブ2 スキルLv (1〜10):</label>
+                <input type="number" id="cvt2-pas2-skill-lv" value="7" min="1" max="10">
             </div>
         </div>
 
         <!-- 右側: 敵ステータス設定 -->
         <div class="card">
             <h2>2. 敵ステータス設定</h2>
-
-            <div class="form-group">
-                <label>戦闘時間</label>
-                <div style="display: flex; align-items: center; gap: 4px;">
-                    <input type="number" id="time-min" value="1" min="0" style="width: 50px;">
-                    <span style="font-size: 0.9rem; color: var(--text-muted);">分</span>
-                    <input type="number" id="time-sec" value="30" min="0" max="59" style="width: 50px;">
-                    <span style="font-size: 0.9rem; color: var(--text-muted);">秒</span>
-                </div>
-            </div>
 
             <div class="form-group">
                 <label for="enemy-hp">敵 HP:(未反映)</label>
@@ -181,13 +206,18 @@
 
     <div class="result-box">
         <div class="result-title">通常攻撃 1発あたりの与えるダメージ:</div>
-        <div class="result-value" id="output-one-hit-damage">0 Damage</div>
-
-        <div class="result-title">通常攻撃 戦闘時間あたりの与えるダメージ:</div>
-        <div class="result-value" id="output-damage">0 Damage</div>
+        <div class="result-value" id="output-one-hit-damage-cvt1">0 Damage</div>
 
         <div style="margin-top: 10px; font-size: 13px; color: #475569;">
-            ・基礎攻撃力: <span id="out-base-atk" style="font-weight:bold;">0</span><br>
+            ・基礎攻撃力: <span id="out-base-atk-cvt1" style="font-weight:bold;">0</span><br>
+        </div>
+    </div>
+    <div class="result-box">
+        <div class="result-title">通常攻撃 1発あたりの与えるダメージ:</div>
+        <div class="result-value" id="output-one-hit-damage-cvt2">0 Damage</div>
+
+        <div style="margin-top: 10px; font-size: 13px; color: #475569;">
+            ・基礎攻撃力: <span id="out-base-atk-cvt2" style="font-weight:bold;">0</span><br>
         </div>
     </div>
 

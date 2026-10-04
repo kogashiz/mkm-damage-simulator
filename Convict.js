@@ -45,8 +45,7 @@ export class Convict {
     calculateBaseAtk() {
         const atkPerLv = (this.baseAtkLv90 - this.baseAtkLv1) / 89;
         const absentAtkLv = 90 - this.level;
-        // return Math.floor(this.baseAtkLv90 - (atkPerLv * absentAtkLv));
-        return 605;
+        return Math.floor(this.baseAtkLv90 - (atkPerLv * absentAtkLv));
     }
 
     /** スキル効果の取得（子クラスで上書きする）⇒ 用途よくわかってないので一旦コメントアウト */
