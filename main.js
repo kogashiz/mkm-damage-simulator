@@ -1,5 +1,7 @@
+import { Party } from './Party.js';
 import { Nox } from './Nox.js';
 import { Shin } from './Shin.js';
+import { formatBuffsForDebug } from './Helper.js';
 
 // 扱いたいコンビクトのインスタンスを生成して保持
 export const convicts = {
@@ -31,6 +33,7 @@ function updateCalculation() {
     const enemyDef = parseInt(document.getElementById('enemy-def').value) || 0;
     const isCoreBroken = document.getElementById('is-core-broken').checked;
 
+    const party = new Party();
     // プレフィックスの配列（人数分増やす）
     const prefixes = ['cvt1', 'cvt2'];
     const activeConvicts = [];
@@ -43,58 +46,38 @@ function updateCalculation() {
         if (convict) {
             convict.setUserData(data.level, data.normalLv, data.ultLv, data.pas1Lv, data.pas2Lv);
             activeConvicts.push(convict);
+            party.addConvict(convict);
         }
     });
 
     const debugDataArray = [];
-    for (let i = 0; i < activeConvicts.length; i++) {
-        const convict = activeConvicts[i];
-        const oneHitFinalDamage = convict.calculateOneHitFinalAttackDamage(convict, enemyDef, isCoreBroken);
+    for (let i = 0; i < party.convicts.length; i++) {
+        const convict = party.convicts[i];
+        const oneHitFinalDamage = convict.calculateOneHitFinalAttackDamage(convict, party.commBuffs, enemyDef, isCoreBroken);
 
         const prefix = `cvt${i + 1}`;
         const elDamage = document.getElementById(`output-one-hit-damage-${prefix}`);
         const elAtk = document.getElementById(`out-base-atk-${prefix}`);
         if (elDamage) elDamage.textContent = `${oneHitFinalDamage.toLocaleString()} Damage`;
         if (elAtk) elAtk.textContent = convict.baseAtk;
-        // document.getElementById('output-one-hit-damage').textContent = `${oneHitFinalDamage.toLocaleString()} Damage`;
-        // document.getElementById('out-base-atk').textContent = convict.baseAtk;
 
         debugDataArray.push({
             slot: i + 1,
-            targetConvict: convict.name,
+            selectConvict: convict.name,
             convictAtk: convict.baseAtk,
             attackSpeed: convict.attackSpeed,
             oneHitDamage: oneHitFinalDamage,
-            returnedSkillEffects: convict.getBuffMods ? convict.getBuffMods() : [],
+            buffMods: convict.getBuffMods() ? formatBuffsForDebug(convict.getBuffMods()) : [],
         });
-        // const debugData = {
-        //     targetConvict: convict.name,
-        //     convictAtk: convict.baseAtk,
-        //     attackSpeed: convict.attackSpeed,
-        //     returnedSkillEffects: convict.getBuffMods(), // スキルが返した効果配列
-        // };
-        // console.log(debugData);
-        document.getElementById('debug-json').textContent = JSON.stringify(debugDataArray, null, 2);
-        // document.getElementById('debug-json').textContent = JSON.stringify(debugData, null, 2);
     }
-
-    // // 3. ダメージを計算インスタンス側のメソッドを使って計算
-    // // コンビクトごとの攻撃機構に渡して、最終的なダメージをもらう（もしくは画面に表示する情報と一緒に返す）
-    // const oneHitFinalDamage = convict1.calculateOneHitFinalAttackDamage(convict1, enemyDef, isCoreBroken);
-
-    // // 4. 画面表示の更新（例: 基礎攻撃力の表示）
-    // document.getElementById('output-one-hit-damage').textContent = `${oneHitFinalDamage.toLocaleString()} Damage`;
-    // const outBaseAtk = document.getElementById('out-base-atk');
-    // outBaseAtk.textContent = convict1.baseAtk;
-    
-    // // 5. デバッグ表示 (共通配列構造の可視化)
-    // const debugData = {
-    //     targetConvict: convict1.name,
-    //     convictAtk: convict1.baseAtk,
-    //     attackSpeed: convict1.attackSpeed,
-    //     returnedSkillEffects: convict1.getBuffMods(), // スキルが返した効果配列
-    // };
-    // document.getElementById('debug-json').textContent = JSON.stringify(debugData, null, 2);
+    console.log(party.getCommBuffs());
+    debugDataArray.push({
+        slot: party.convicts.length,
+        selectConvict: '全体',
+        oneHitDamage: party.calculatePartyDamage(enemyDef, isCoreBroken),
+        buffMods: formatBuffsForDebug(party.getCommBuffs()),
+    });
+    document.getElementById('debug-json').textContent = JSON.stringify(debugDataArray, null, 2);
 }
 
 // 【① 画面が開いた時（初期化時）に呼び出す】

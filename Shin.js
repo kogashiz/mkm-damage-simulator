@@ -9,6 +9,7 @@ export class Shin extends Convict {
 
     // 必殺技 とりあえず侵蝕状態で設定（最大値）
     static ULT_SKILL_PCT = Object.freeze([
+        0,
         13.5,
         14.6,
         15.7,
@@ -23,6 +24,7 @@ export class Shin extends Convict {
 
     // パッシブ1 覗き見る真実
     static PAS1_SKILL_PCT = Object.freeze([
+        0,
         2.0,
         2.2,
         2.3,
@@ -58,20 +60,20 @@ export class Shin extends Convict {
         // ATK補正（通常ステータスのATK含む）
         buffs.atkMods.push(
             createBuffMod(ATTACK_TYPE.NOT_ATTACK, EFFECT_TYPE.BASE_ATK, this.baseAtk)
-        )
+        );
 
         // 通常攻撃 回復なのでスキップ
         
         // 必殺技 ATKアップ
-        const ultPercent = Shin.ULT_SKILL_PCT[this.normalLv];
+        const ultPercent = Shin.ULT_SKILL_PCT[this.ultLv];
         buffs.damageMods.push(
-            createBuffMod(ATTACK_TYPE.NORMAL, EFFECT_TYPE.ATK_UP, toRatio(ultPercent))
-        )
+            createBuffMod(ATTACK_TYPE.NORMAL, EFFECT_TYPE.ATK_UP, toRatio(ultPercent), 'ALL')
+        );
 
-        // パッシブ1 通常攻撃ダメージアップ
+        // パッシブ1 通常攻撃ダメージアップ 最大10スタック溜まっているとする
         const pas1Percent = Shin.PAS1_SKILL_PCT[this.pas1Lv];
         buffs.defMods.push(
-            createBuffMod(ATTACK_TYPE.NOT_ATTACK, EFFECT_TYPE.NORMAL_DAMAGE_UP, toRatio(pas1Percent))
+            createBuffMod(ATTACK_TYPE.NOT_ATTACK, EFFECT_TYPE.NORMAL_DAMAGE_UP, toRatio(pas1Percent) * 10, 'ALL')
         );
 
         // パッシブ2 不朽限定なのでスキップ

@@ -105,13 +105,13 @@ export class Nox extends Convict {
         // ATK補正（通常ステータスのATK含む）
         buffs.atkMods.push(
             createBuffMod(ATTACK_TYPE.NOT_ATTACK, EFFECT_TYPE.BASE_ATK, this.baseAtk)
-        )
+        );
 
         // 通常攻撃（通常攻撃のスキル倍率のこと）
         const normalPercent = Nox.NORMAL_SKILL_PCT[this.normalLv];
         buffs.damageMods.push(
             createBuffMod(ATTACK_TYPE.NORMAL, EFFECT_TYPE.BASE_DAMAGE_COEF, toRatio(normalPercent))
-        )
+        );
 
         // 必殺技 ややこしいのであとで TODO
 
@@ -122,7 +122,7 @@ export class Nox extends Convict {
         // パッシブ2 DEFダウン（そういえば再構築でバフ変わるけど一旦無視）
         const pas2Percent = Nox.PAS2_SKILL_PCT[this.pas2Lv];
         buffs.defMods.push(
-            createBuffMod(ATTACK_TYPE.NOT_ATTACK, EFFECT_TYPE.DEF_DOWN, toRatio(pas2Percent))
+            createBuffMod(ATTACK_TYPE.NOT_ATTACK, EFFECT_TYPE.DEF_DOWN, toRatio(pas2Percent), 'ALL')
         );
                 
         
