@@ -1,56 +1,83 @@
+import { Party } from './Party.js';
 import { Nox } from './Nox.js';
-import { Demolia } from './Demolia.js';
+import { Shin } from './Shin.js';
+import { formatBuffsForDebug } from './Helper.js';
 
 // 扱いたいコンビクトのインスタンスを生成して保持
 export const convicts = {
     nox: new Nox(),
-    demolia: new Demolia()
+    shin: new Shin(),
 };
+
+// 1人分のフォームデータをまとめて取得するヘルパー関数
+function getConvictFormData(prefix) {
+    const selectConvict = document.getElementById(`select-${prefix}`);
+    
+    if (!selectConvict) return null; // 要素がなければスキップ
+
+    return {
+        key: selectConvict.value,
+        level: parseInt(document.getElementById(`${prefix}-char-level`)?.value) || 1,
+        normalLv: parseInt(document.getElementById(`${prefix}-normal-skill-lv`)?.value) || 1,
+        ultLv: parseInt(document.getElementById(`${prefix}-ult-skill-lv`)?.value) || 1,
+        pas1Lv: parseInt(document.getElementById(`${prefix}-pas1-skill-lv`)?.value) || 1,
+        pas2Lv: parseInt(document.getElementById(`${prefix}-pas2-skill-lv`)?.value) || 1,
+    };
+}
 
 /**
  * 画面の入力値を読み取り、コンビクトインスタンスを更新して再計算・画面反映を行う
  */
 function updateCalculation() {
-    // 1. 画面の入力要素を取得
-    const selectConvict = document.getElementById('select-convict').value;
-    const level = parseInt(document.getElementById('char-level').value) || 1;
-    const normalLv = parseInt(document.getElementById('normal-skill-lv').value) || 1;
-    const ultLv = parseInt(document.getElementById('ult-skill-lv').value) || 1;
-    const pas1Lv = parseInt(document.getElementById('pas1-skill-lv').value) || 1;
-    const pas2Lv = parseInt(document.getElementById('pas2-skill-lv').value) || 1;
-
-    // 2. 選択されたコンビクトインスタンスを取得
-    const convict = convicts[selectConvict];
-    if (!convict) return;
-
-    // 画面の入力値を反映
-    convict.setUserData(level, normalLv, ultLv, pas1Lv, pas2Lv);
     // 画面の敵ステータスを取得
     const enemyDef = parseInt(document.getElementById('enemy-def').value) || 0;
     const isCoreBroken = document.getElementById('is-core-broken').checked;
 
-    // 3. インスタンス側のメソッドを使って計算
-    // 1回あたりの通常攻撃ダメージ
-    const oneHitFinalDamage = convict.calculateOneHitFinalAttackDamage(convict, enemyDef, isCoreBroken);
+    const party = new Party();
+    // プレフィックスの配列（人数分増やす）
+    const prefixes = ['cvt1', 'cvt2'];
+    const activeConvicts = [];
+    // 設定した人数分データを用意する
+    prefixes.forEach(prefix => {
+        const data = getConvictFormData(prefix);
+        if (!data) return;
 
-    // 4. 画面表示の更新（例: 基礎攻撃力の表示）
-    document.getElementById('output-damage').textContent = `${oneHitFinalDamage.toLocaleString()} Damage`;
-    const outBaseAtk = document.getElementById('out-base-atk');
-    outBaseAtk.textContent = convict.baseAtk;
-    
-    // 5. デバッグ表示 (共通配列構造の可視化)
-    const debugData = {
-        targetConvict: convict.name,
-        convictAtk: convict.baseAtk,
-        returnedSkillEffects: convict.getBuffMods(), // スキルが返した効果配列
-        // enemyCondition: {
-        //     def: enemyDef,
-        //     defFactorRate: `${(result.defRate * 100).toFixed(1)}%`,
-        //     coreBreakMultiplier: isCoreBroken ? "150%" : "100%"
-        // },
-        // finalDamagePerHit: result.damage
-    };
-    document.getElementById('debug-json').textContent = JSON.stringify(debugData, null, 2);
+        const convict = convicts[data.key];
+        if (convict) {
+            convict.setUserData(data.level, data.normalLv, data.ultLv, data.pas1Lv, data.pas2Lv);
+            activeConvicts.push(convict);
+            party.addConvict(convict);
+        }
+    });
+
+    const debugDataArray = [];
+    for (let i = 0; i < party.convicts.length; i++) {
+        const convict = party.convicts[i];
+        const oneHitFinalDamage = convict.calculateOneHitFinalAttackDamage(convict, party.commBuffs, enemyDef, isCoreBroken);
+
+        const prefix = `cvt${i + 1}`;
+        const elDamage = document.getElementById(`output-one-hit-damage-${prefix}`);
+        const elAtk = document.getElementById(`out-base-atk-${prefix}`);
+        if (elDamage) elDamage.textContent = `${oneHitFinalDamage.toLocaleString()} Damage`;
+        if (elAtk) elAtk.textContent = convict.baseAtk;
+
+        debugDataArray.push({
+            slot: i + 1,
+            selectConvict: convict.name,
+            convictAtk: convict.baseAtk,
+            attackSpeed: convict.attackSpeed,
+            oneHitDamage: oneHitFinalDamage,
+            buffMods: convict.getBuffMods() ? formatBuffsForDebug(convict.getBuffMods()) : [],
+        });
+    }
+    console.log(party.getCommBuffs());
+    debugDataArray.push({
+        slot: party.convicts.length,
+        selectConvict: '全体',
+        oneHitDamage: party.calculatePartyDamage(enemyDef, isCoreBroken),
+        buffMods: formatBuffsForDebug(party.getCommBuffs()),
+    });
+    document.getElementById('debug-json').textContent = JSON.stringify(debugDataArray, null, 2);
 }
 
 // 【① 画面が開いた時（初期化時）に呼び出す】
@@ -68,6 +95,8 @@ const inputIds = [
     'pas2-skill-lv',
     'enemy-def',
     'is-core-broken',
+    'time-min',
+    'time-sec',
 ];
 
 inputIds.forEach(id => {

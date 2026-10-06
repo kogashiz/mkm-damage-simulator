@@ -115,11 +115,12 @@ export function toRatio(percentValue) {
  * @param {Object} options - オプション (targetTypeなど)
  * @returns {Object} 標準化されたModオブジェクト
  */
-export function createBuffMod(attackType, effectType, buffRatio) {
+export function createBuffMod(attackType, effectType, buffRatio, scope = 'SELF') {
     return {
         attackType: attackType,
         effectType: effectType,
         effectTypeLabel: EFFECT_TYPE_LABEL[effectType],
         buffRatio: buffRatio,
+        scope // 'SELF' (自分のみ) | 'ALL'（全体) | 'TARGET' (コンビクト指定) など
     };
 }

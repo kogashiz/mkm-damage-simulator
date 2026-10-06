@@ -11,13 +11,13 @@ export class Convict {
      * @param {string} pas2Name - パッシブ2の名前
      */
     // 各キャラ固有のステータス、子クラスから初期値を設定する
-    constructor(id, name, baseAtkLv1, baseAtkLv90, pas1Name = "パッシブ1", pas2Name = "パッシブ2") {
+    constructor(id, name, baseAtkLv1, baseAtkLv90, attackSpeed, ultEnergyCost) {
         this.id = id;
         this.name = name;
         this.baseAtkLv1 = baseAtkLv1;
         this.baseAtkLv90 = baseAtkLv90;
-        this.pas1Name = pas1Name;
-        this.pas2Name = pas2Name;
+        this.attackSpeed = attackSpeed;
+        this.ultEnergyCost = ultEnergyCost;
 
         // 画面からの入力値を保持する、super()した直後は未初期化状態のため、初期値-1とする
         // 多分ここに追加：専属とか刻印とか
@@ -45,8 +45,7 @@ export class Convict {
     calculateBaseAtk() {
         const atkPerLv = (this.baseAtkLv90 - this.baseAtkLv1) / 89;
         const absentAtkLv = 90 - this.level;
-        // return Math.floor(this.baseAtkLv90 - (atkPerLv * absentAtkLv));
-        return 605;
+        return Math.floor(this.baseAtkLv90 - (atkPerLv * absentAtkLv));
     }
 
     /** スキル効果の取得（子クラスで上書きする）⇒ 用途よくわかってないので一旦コメントアウト */
@@ -61,8 +60,10 @@ export class Convict {
     }
 
     // ダメージ計算で使う最終的なATKの計算
-    calculateFinalAtk(convict) {
-        const atkMods = convict.getBuffMods().atkMods;
+    calculateFinalAtk(convict, commBuffs) {
+        const selfAtkMods = convict.getBuffMods()?.atkMods ?? [];
+        const commAtkMods = commBuffs?.atkMods ?? [];
+        const atkMods = selfAtkMods.concat(commAtkMods);
         // atkModsのEFFECT_TYPEを見て、基礎atkを足し引きする
         
         // とりあえず基礎ATKだけそのまま返す
@@ -70,8 +71,10 @@ export class Convict {
     }
 
     // ダメージ計算で使う最終的なDEFの計算
-    calculateFinalDef(convict, enemyDef) {
-        const defMods = convict.getBuffMods().defMods;
+    calculateFinalDef(convict, commBuffs, enemyDef) {
+        const selfDefMods = convict.getBuffMods()?.defMods ?? [];
+        const commDefMods = commBuffs?.defMods ?? [];
+        const defMods = selfDefMods.concat(commDefMods);
         let totalDefDown = 0;
         let totalPhyDown = 0;
         for (const mod of defMods) {
@@ -90,8 +93,10 @@ export class Convict {
     }
 
     // ダメージ計算で使う最終的なダメージ係数の計算
-    calculateFinalDamageMult(convict, attackType) {
-        const damageMods = convict.getBuffMods().damageMods;
+    calculateFinalDamageMult(convict, commBuffs, attackType) {
+        const selfDamageMods = convict.getBuffMods()?.damageMods ?? [];
+        const commDamageMods = commBuffs?.damageMods ?? [];
+        const damageMods = selfDamageMods.concat(commDamageMods);
         // 通常攻撃なら通常攻撃のスキル倍率、必殺技ならそのスキル倍率をそれぞれ返す
         const matchedMod = damageMods.find(mod => mod.attackType === attackType);
         // もし該当の倍率がなければ、エラーを示すために-1を返す
@@ -99,13 +104,15 @@ export class Convict {
     }
 
     // ダメージ計算で使う最終的なクリティカル補正の計算
-    calculateFinalCriticalMult(convict) {
+    calculateFinalCriticalMult(convict, commBuffs) {
         return 1; // dummy
     }
 
     // ダメージ計算で使う最終的なその他色々補正の計算
-    calculateFinalEtcMult(convict, isCoreBroken) {
-        const etcMods = convict.getBuffMods().etcMods;
+    calculateFinalEtcMult(convict, commBuffs, isCoreBroken) {
+        const selfEtcMods = convict.getBuffMods()?.etcMods ?? [];
+        const commEtcMods = commBuffs?.etcMods ?? [];
+        const etcMods = selfEtcMods.concat(commEtcMods);
         // バフの種類ごとに数値を足し算
         const typeSums = etcMods.reduce((acc, mod) => {
             // コアブレイク状態ではない場合、コア破壊時のバフは除く
@@ -126,22 +133,22 @@ export class Convict {
     /**
      * ダメージ計算式。共通
      */
-    calculateOneHitFinalDamage(convict, attackType, enemyDef, isCoreBroken) {
+    calculateOneHitFinalDamage(convict, commBuffs, attackType, enemyDef, isCoreBroken) {
         // 1. 最終ATKの算出
-        const finalAtk = this.calculateFinalAtk(convict);
+        const finalAtk = this.calculateFinalAtk(convict, commBuffs);
 
         // 2. 最終DEF/MDFの算出
-        const finalDef = this.calculateFinalDef(convict, enemyDef);
+        const finalDef = this.calculateFinalDef(convict, commBuffs, enemyDef);
         // const finalMdf = calculateFinalMdf(convict);
 
         // 3. 最終ダメージ係数の算出
-        const finalDamageMult = this.calculateFinalDamageMult(convict, attackType);
+        const finalDamageMult = this.calculateFinalDamageMult(convict, commBuffs, attackType);
 
         // 4. クリティカル補正の算出
-        const finalCriticalMult = this.calculateFinalCriticalMult(convict);
+        const finalCriticalMult = this.calculateFinalCriticalMult(convict, commBuffs);
 
         // 5. その他補正の算出
-        const etcMult = this.calculateFinalEtcMult(convict, isCoreBroken);
+        const etcMult = this.calculateFinalEtcMult(convict, commBuffs, isCoreBroken);
 
         // 6. 最終ダメージ
         // = (最終ATK - 最終DEF/MDF) × ダメージ係数 × クリティカル × その他補正
@@ -151,13 +158,13 @@ export class Convict {
     }
 
     // 通常攻撃ダメージ
-    calculateOneHitFinalAttackDamage(convict, enemyDef, isCoreBroken) {
-        return this.calculateOneHitFinalDamage(convict, ATTACK_TYPE.NORMAL, enemyDef, isCoreBroken)
+    calculateOneHitFinalAttackDamage(convict, commBuffs, enemyDef, isCoreBroken) {
+        return this.calculateOneHitFinalDamage(convict, commBuffs, ATTACK_TYPE.NORMAL, enemyDef, isCoreBroken)
     }
 
     // 必殺技ダメージ
     calculateOneHitFinalUltDamage(convict) {
-        return this.calculateOneHitFinalDamage(convict, ATTACK_TYPE.ULT, isCoreBroken)
+        return this.calculateOneHitFinalDamage(convict, commBuffs, ATTACK_TYPE.ULT, isCoreBroken)
     }
 
 
